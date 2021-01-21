@@ -61,9 +61,12 @@ import org.springframework.beans.BeansException;
  */
 
 
-/**
+/**---------------------------------------------------------------------------------------------------------------
  * BeanFactoryPostProcessor 为spring在容器初始化时对外暴露的扩展点，
  * 容器允许BeanFactoryPostProcessor在容器加载注册BeanDefinition完成之后读取BeanDefinition(配置元数据)，并可以修改它。
+ * 注意：
+ *     BeanFactoryPostProcessor是在spring容器加载了bean的定义文件之后，在bean实例化之前执行的。
+ *     接口方法的入参是ConfigurrableListableBeanFactory，使用该参数，可以获取到相关bean的定义信息
  */
 @FunctionalInterface
 public interface BeanFactoryPostProcessor {

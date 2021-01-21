@@ -586,6 +586,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
+					/**
+					 *  这一步不懂？？？？？？？？？？？
+					 * 这一步的作用就是将所有的后置处理器(BeanPostProcessor)拿出来，并且把名字叫beanName的类中的变量都封装到
+					 * InjectionMetadata的injectedElements集合里面，目的是以后从中获取，挨个创建实例，
+					 * 通过反射注入到相应类中。
+					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
 				catch (Throwable ex) {
@@ -616,8 +622,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			/**-------------------------------------------------
 			 * 该方法是填充属性：
-			 *      （1）填充bean的自定义的属性(如：Person对象的name、age属性等)
-			 *      （2）
+			 *      （1）填充bean的自定义的属性(如：Person对象的name、age属性等)，会调用setxxx()方法（注：一定要有set()方法，否则会报错）
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
 			/**----------------------------------------------------
@@ -625,7 +630,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 		1：填充bean实现的xxxAware接口的属性。注：这里只填充BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
 			 * 	    2：对bean进行初始化：
 			 *         2.1执行BeanPostProcessor的xxxBeforexxx()方法；
-			 *         2.2执行初始化方法 init-method；
+			 *         2.2执行初始化方法，这里的初始化方法包括3种：
+			 *              1-让Bean实现InitialzingBean定义初始化逻辑；DisposableBean定义销毁逻辑
+			 *              2-在bean定义的时候，通过init-method和destory-method
+			 *              3-使用JSR250规范里定义的两个注解@PostConstruct  @PreDestroy
 			 *         2.3执行BeanPostProcessor的xxxAfterxxx()方法；
 			 */
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
@@ -1439,6 +1447,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					if (filteredPds == null) {
 						filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
 					}
+					/**
+					 *
+					 */
 					pvsToUse = bp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						return;
@@ -1456,7 +1467,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		if (pvs != null) {
 			/**------------------
-			 * 给bean填充属性
+			 * 给bean填充属性，使用set()方法填充bean的自定义属性（Person的name、age）
 			 */
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}
@@ -1755,6 +1766,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
+			/**
+			 * 自定义bean(如：Person)对象的setxxx()方法在这执行
+			 */
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		}
 		catch (BeansException ex) {

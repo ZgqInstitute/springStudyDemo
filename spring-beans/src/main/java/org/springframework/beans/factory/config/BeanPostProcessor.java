@@ -57,13 +57,20 @@ import org.springframework.lang.Nullable;
  */
 
 
-/**
+/**------------------------------------自己总结-------------------------------------
  * 运行顺序:
  *   1)Spring IOC容器实例化Bean
  *   2)调用BeanPostProcessor的postProcessBeforeInitialization方法
- *   3)调用bean实例的初始化方法
+ *   3)调用bean实例的初始化方法（有3种初始化方法）
  *   4)调用BeanPostProcessor的postProcessAfterInitialization方法
- */
+ *
+ * 常用的BeanPostProcessor总结：
+ *   1）CommonAnnotationBeanPostProcessor：支持@Resource注解的注入
+ *   2）RequiredAnnotationBeanPostProcessor：支持@Required注解的注入
+ *   3）AutowiredAnnotationBeanPostProcessor：支持@Autowired注解的注入
+ *   4）ApplicationContextAwareProcessor：用来为bean注入ApplicationContext等容器对象
+ *
+ *------------------------------------------------------------------------------------/
 public interface BeanPostProcessor {
 
 	/**

@@ -581,7 +581,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Register bean processors that intercept bean creation.
 				/**-----------------------------
-				 * 向容器中注册BeanPostProcessor
+				 * 实例化BeanPostProcessor的实现类，并注册到容器BeanPostProcessor中
 				 */
 				registerBeanPostProcessors(beanFactory);
 
