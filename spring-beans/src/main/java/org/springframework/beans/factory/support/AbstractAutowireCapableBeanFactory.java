@@ -568,12 +568,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			/**
+			/**------------------------------------------------
 			 * 实例化方法
 			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
-		/**
+		/**------------------------------------------------
 		 * 这个bean已经实例化好了，但是现在所有的属性值都为空
 		 */
 		Object bean = instanceWrapper.getWrappedInstance();
@@ -605,7 +605,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			/**
+			/**----------------------------------------------
 			 * 向三级缓存加 key：beanName   value：lambda表达式
 			 */
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
@@ -614,13 +614,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
-			/**
+			/**-------------------------------------------------
 			 * 该方法是填充属性：
 			 *      （1）填充bean的自定义的属性(如：Person对象的name、age属性等)
 			 *      （2）
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
-			/**
+			/**----------------------------------------------------
 			 * 该方法的作用：
 			 * 		1：填充bean实现的xxxAware接口的属性。注：这里只填充BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
 			 * 	    2：对bean进行初始化：
@@ -1455,7 +1455,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (pvs != null) {
-			/**
+			/**------------------
 			 * 给bean填充属性
 			 */
 			applyPropertyValues(beanName, mbd, bw, pvs);
@@ -1704,11 +1704,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				deepCopy.add(pv);
 			}
 			else {
-				/**
+				/**-----------------------------------------
 				 * 这个propertyName就是需要给bean填充的属性名称
 				 */
 				String propertyName = pv.getName();
-				/**
+				/**------------------------------------------------
 				 * 这个originalValue的类型是：RuntimeBeanReference
 				 */
 				Object originalValue = pv.getValue();
@@ -1806,7 +1806,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
-			/**
+			/**---------------------------------------------------------------------------------------------------
 			 * 填充bean实现的xxxAware接口的属性。注：这里只填充BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
 			 */
 			invokeAwareMethods(beanName, bean);
@@ -1814,7 +1814,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
-			/**
+			/**-----------------------------------------------------------
 			 * 这里会执行BeanPostProcessor的xxxbeforexxx()方法，
 			 * 其中执行的BeanPostProcessor各种的作用如下：
 			 *    1）ApplicationContextAwareProcessor，给bean填充aware属性
@@ -1824,7 +1824,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			/**
+			/**--------------------------------------------------------------------------------
 			 * 调用初始化方法，先调用bean的InitializingBean接口的方法，后调用bean的自定义初始化方法
 			 */
 			invokeInitMethods(beanName, wrappedBean, mbd);
@@ -1835,7 +1835,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
-			/**
+			/**----------------------------------------------
 			 *这里会执行BeanPostProcessor的xxxAfterxxx()方法
 			 */
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);

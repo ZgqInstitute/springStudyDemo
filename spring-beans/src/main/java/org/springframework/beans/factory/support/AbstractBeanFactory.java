@@ -253,7 +253,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object beanInstance;
 
 		// Eagerly check singleton cache for manually registered singletons.
-		/**
+		/**-------------------------------------------
 		 * 先看一级缓存中是否有单例对象
 		 */
 		Object sharedInstance = getSingleton(beanName);
@@ -333,12 +333,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				if (mbd.isSingleton()) {
-					/**
+					/**------------------------------
 					 * 这个方法将创建好的bean放入Map
 					 */
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
-							/**
+							/**------------------
 							 * 创建bean
 							 */
 							return createBean(beanName, mbd, args);

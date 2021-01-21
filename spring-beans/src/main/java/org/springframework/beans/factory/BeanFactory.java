@@ -69,9 +69,9 @@ import org.springframework.lang.Nullable;
  * <ol>
  *
  *
- * ================================bean的生命周期============================================
+ * =================================bean的生命周期=============================================
  *
- * -----------------------------执行xxxAware对属性进行填充---------------------------------------
+ * ----------------------------执行xxxAware对属性进行填充--------------------------------------
  * <li>BeanNameAware's {@code setBeanName}
  * <li>BeanClassLoaderAware's {@code setBeanClassLoader}
  * <li>BeanFactoryAware's {@code setBeanFactory}
@@ -87,27 +87,27 @@ import org.springframework.lang.Nullable;
  * (only applicable when running in an application context)
  * <li>ServletContextAware's {@code setServletContext}
  *
- * -----------------执行BeanPostProcessors的postProcessBeforeInitialization()方法---------------
+ * ------------------执行BeanPostProcessors的postProcessBeforeInitialization()方法----------------
  * (only applicable when running in a web application context)
  * <li>{@code postProcessBeforeInitialization} methods of BeanPostProcessors
  * <li>InitializingBean's {@code afterPropertiesSet}
  *
- * -------------------------------------执行init-method----------------------------------------
+ * --------------------------------------执行init-method-----------------------------------------
  * <li>a custom init-method definition
  *
- * -----------------执行BeanPostProcessors的postProcessAfterInitialization()方法---------------
+ * ------------------执行BeanPostProcessors的postProcessAfterInitialization()方法----------------
  * <li>{@code postProcessAfterInitialization} methods of BeanPostProcessors
  * </ol>
  *
  * <p>On shutdown of a bean factory, the following lifecycle methods apply:
  * <ol>
- *             ==========================销毁方法 有3步=========================
+ *             =========================销毁方法 有3步==========================
  *
- * -----------------------------postProcessBeforeDestruction--------------------------------
+ * ------------------------------postProcessBeforeDestruction---------------------------------
  * <li>{@code postProcessBeforeDestruction} methods of DestructionAwareBeanPostProcessors
- * -------------------------------------DisposableBean----------------------------------------
+ * --------------------------------------DisposableBean-----------------------------------------
  * <li>DisposableBean's {@code destroy}
- * -------------------------------------destroy-method----------------------------------------
+ * --------------------------------------destroy-method-----------------------------------------
  * <li>a custom destroy-method definition
  * </ol>
  *

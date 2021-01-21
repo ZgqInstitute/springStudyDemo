@@ -136,7 +136,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
-			/**
+			/**--------------------------------------
 			 * 将创建好的bean放入singletonObjects  Map
 			 */
 			this.singletonObjects.put(beanName, singletonObject);
@@ -272,7 +272,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					/**
+					/**---------------------------------------------------------
 					 * 将创建好的bean放入Map
 					 * 将beanName和singletonObject的映射关系添加到容器的单例缓存中
 					 */
