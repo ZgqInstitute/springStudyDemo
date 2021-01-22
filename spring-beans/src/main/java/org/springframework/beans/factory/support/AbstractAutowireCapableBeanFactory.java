@@ -594,6 +594,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					 * 调用MergedBeanDefinitionPostProcessor接口（该接口是AutowiredAnnotationBeanPostProcessor的父类，是BeanPostProcessor接口的子类）
 					 * 的postProcessMergedBeanDefinition()方法。  因为AutowiredAnnotationBeanPostProcessor实现了MergedBeanDefinitionPostProcessor，
 					 * 所以会调用AutowiredAnnotationBeanPostProcessor的MergedBeanDefinitionPostProcessor()方法
+					 *
+					 * 读取bean的field和method上的注解，并判断该注解是否在autowiredAnnotationTypes中，如果在则将field封装成AutowiredFiledElement对象、
+					 * 将method封装成AutoWiredMethodElement对象，并存放到 《 InjectionMetadata 》 对象的Set<InjectedElement> checkedElements属性中，
+					 * 最后将该InjectionMetadata对象缓存到了AutowiredAnnotationBeanPostProcessor的Map<String, InjectionMetadata> injectionMetadataCache属性中；
+					 * 说白了就是将bean中被@Autowried（当然还包括@Value、@Inject）修饰的field、method找出来，封装成InjectionMetadata对象并缓存起来
 					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
@@ -624,11 +629,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object exposedObject = bean;
 		try {
 			/**-------------------------------------------------
-			 * 该方法是填充属性：
+			 * 该方法做的事：
 			 *      （1）填充bean的自定义的属性(如：Person对象的name、age属性等)，会调用setxxx()方法（注：一定要有set()方法，否则会报错）
-			 *      （2）依赖注入
+			 *      （2）依赖注入 （  通过反射注入 field.set()  ）
+			 *      （3）执行bean标注了@Autowired的方法    （   通过反射调用 method.invoke()  ）
+			 *
+			 *  注：循环依赖发生在这个方法
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
+
 			/**----------------------------------------------------
 			 * 该方法的作用：
 			 * 		1：填充bean实现的xxxAware接口的属性。注：这里只填充BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
