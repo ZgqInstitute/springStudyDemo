@@ -589,8 +589,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					/**
 					 *  这一步不懂？？？？？？？？？？？
 					 * 这一步的作用就是将所有的后置处理器(BeanPostProcessor)拿出来，并且把名字叫beanName的类中的变量都封装到
-					 * InjectionMetadata的injectedElements集合里面，目的是以后从中获取，挨个创建实例，
-					 * 通过反射注入到相应类中。
+					 * InjectionMetadata的injectedElements集合里面，目的是以后从中获取，挨个创建实例，通过反射注入到相应类中。
+					 *
+					 * 调用MergedBeanDefinitionPostProcessor接口（该接口是AutowiredAnnotationBeanPostProcessor的父类，是BeanPostProcessor接口的子类）
+					 * 的postProcessMergedBeanDefinition()方法。  因为AutowiredAnnotationBeanPostProcessor实现了MergedBeanDefinitionPostProcessor，
+					 * 所以会调用AutowiredAnnotationBeanPostProcessor的MergedBeanDefinitionPostProcessor()方法
 					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
@@ -602,7 +605,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// Eagerly cache singletons to be able to resolve circular references
+		// Eagerly cache singletons to be able to resolve circular references（立即缓存单例以便能够解析循环引用）
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
@@ -623,6 +626,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			/**-------------------------------------------------
 			 * 该方法是填充属性：
 			 *      （1）填充bean的自定义的属性(如：Person对象的name、age属性等)，会调用setxxx()方法（注：一定要有set()方法，否则会报错）
+			 *      （2）依赖注入
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
 			/**----------------------------------------------------
