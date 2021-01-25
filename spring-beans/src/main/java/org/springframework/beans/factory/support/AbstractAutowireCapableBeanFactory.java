@@ -440,6 +440,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
+		/**
+		 * getBeanPostProcessors()方法会获取与当前beanName所有有关的BeanPostProcessor实现类
+		 */
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
@@ -569,7 +572,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (instanceWrapper == null) {
 			/**------------------------------------------------
-			 * 实例化方法
+			 * 实例化方法 （通过反射进行实例化）
 			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
@@ -586,7 +589,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
-					/**
+					/**-----------------------------------------------------------------------------------------------------------------------------
 					 *  这一步不懂？？？？？？？？？？？
 					 * 这一步的作用就是将所有的后置处理器(BeanPostProcessor)拿出来，并且把名字叫beanName的类中的变量都封装到
 					 * InjectionMetadata的injectedElements集合里面，目的是以后从中获取，挨个创建实例，通过反射注入到相应类中。
@@ -599,6 +602,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					 * 将method封装成AutoWiredMethodElement对象，并存放到 《 InjectionMetadata 》 对象的Set<InjectedElement> checkedElements属性中，
 					 * 最后将该InjectionMetadata对象缓存到了AutowiredAnnotationBeanPostProcessor的Map<String, InjectionMetadata> injectionMetadataCache属性中；
 					 * 说白了就是将bean中被@Autowried（当然还包括@Value、@Inject）修饰的field、method找出来，封装成InjectionMetadata对象并缓存起来
+					 * -----------------------------------------------------------------------------------------------------------------------------------
 					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
@@ -621,6 +625,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			/**----------------------------------------------
 			 * 向三级缓存加 key：beanName   value：lambda表达式
+			 *
+			 * 若有AOP，这一步会生成代理对象
 			 */
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
@@ -1011,12 +1017,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @return the object to expose as bean reference
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
+		/**-----------zgq----------
+		 * 这个bean对象是被代理的对象，将被代理的对象赋值给exposedObject，提前暴露对象
+		 */
 		Object exposedObject = bean;
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
+				/**-----------zgq----------
+				 * 对被代理对象进行包装，返回代理对象。  点进方法最终会调用到Proxy.newProxyInstance(参数1,参数2,参数3)方法
+				 */
 				exposedObject = bp.getEarlyBeanReference(exposedObject, beanName);
 			}
 		}
+
+		/**-----------zgq----------
+		 * ->若没有AOP，这里直接返回exposedObject
+		 * ->若有AOP，这里会返回对被代理对象包装过得对象（代理对象）
+		 */
 		return exposedObject;
 	}
 
@@ -1728,11 +1745,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				deepCopy.add(pv);
 			}
 			else {
-				/**-----------------------------------------
+				/**------------------zgq--------------------
 				 * 这个propertyName就是需要给bean填充的属性名称
 				 */
 				String propertyName = pv.getName();
-				/**------------------------------------------------
+				/**--------------------zgq-------------------------
 				 * 这个originalValue的类型是：RuntimeBeanReference
 				 */
 				Object originalValue = pv.getValue();
@@ -1743,8 +1760,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					}
 					originalValue = new DependencyDescriptor(new MethodParameter(writeMethod, 0), true);
 				}
-				/**
-				 *
+				/**--------------------zgq-------------------------
+				 * 解析originalValue，将originalValue封装成
 				 */
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				Object convertedValue = resolvedValue;
@@ -1779,7 +1796,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
-			/**
+			/**---------------------------zgq---------------------------
 			 * 自定义bean(如：Person)对象的setxxx()方法在这执行
 			 */
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));

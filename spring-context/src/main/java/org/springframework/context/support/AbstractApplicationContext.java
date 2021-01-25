@@ -580,7 +580,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				/**-----------------------------
+				/**---------------------------------------------------------------
 				 * 实例化BeanPostProcessor的实现类，并注册到容器BeanPostProcessor中
 				 */
 				registerBeanPostProcessors(beanFactory);
@@ -598,6 +598,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
+				/**------------------------------------------------------------------------
+				 * 该方法做的事，debug进去最终会进入doCreateBean()方法，该方法主要做了如下事：
+				 *    1）调用createBeanInstance()方法通过反射实例化对象；
+				 *    2）调用populateBean()方法，填充属性；
+				 *    3) 调用initializeBean()方法，填充bean实现的xxxAware接口的属性 和 对bean进行初始化
+				 */
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
