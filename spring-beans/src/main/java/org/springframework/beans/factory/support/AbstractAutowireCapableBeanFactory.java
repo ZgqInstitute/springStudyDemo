@@ -571,12 +571,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			/**------------------------------------------------
+			/**--------------------zgq-------------------------
 			 * 实例化方法 （通过反射进行实例化）
 			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
-		/**------------------------------------------------
+		/**----------------------zgq------------------------
 		 * 这个bean已经实例化好了，但是现在所有的属性值都为空
 		 */
 		Object bean = instanceWrapper.getWrappedInstance();
@@ -589,7 +589,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
-					/**-----------------------------------------------------------------------------------------------------------------------------
+					/**----------------------------------------------------zgq--------------------------------------------------------------------
 					 *  这一步不懂？？？？？？？？？？？
 					 * 这一步的作用就是将所有的后置处理器(BeanPostProcessor)拿出来，并且把名字叫beanName的类中的变量都封装到
 					 * InjectionMetadata的injectedElements集合里面，目的是以后从中获取，挨个创建实例，通过反射注入到相应类中。
@@ -602,7 +602,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					 * 将method封装成AutoWiredMethodElement对象，并存放到 《 InjectionMetadata 》 对象的Set<InjectedElement> checkedElements属性中，
 					 * 最后将该InjectionMetadata对象缓存到了AutowiredAnnotationBeanPostProcessor的Map<String, InjectionMetadata> injectionMetadataCache属性中；
 					 * 说白了就是将bean中被@Autowried（当然还包括@Value、@Inject）修饰的field、method找出来，封装成InjectionMetadata对象并缓存起来
-					 * -----------------------------------------------------------------------------------------------------------------------------------
 					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
@@ -623,7 +622,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			/**----------------------------------------------
+			/**--------------------zgq------------------------
 			 * 向三级缓存加 key：beanName   value：lambda表达式
 			 *
 			 * 若有AOP，这一步会生成代理对象
@@ -634,7 +633,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
-			/**-------------------------------------------------
+			/**-------------------zgq---------------------------
 			 * 该方法做的事：
 			 *      （1）填充bean的自定义的属性(如：Person对象的name、age属性等)，会调用setxxx()方法（注：一定要有set()方法，否则会报错）
 			 *      （2）依赖注入 （  通过反射注入 field.set()  ）
@@ -644,7 +643,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
 
-			/**----------------------------------------------------
+			/**----------------------zgq---------------------------
 			 * 该方法的作用：
 			 * 		1：填充bean实现的xxxAware接口的属性。注：这里只填充BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
 			 * 	    2：对bean进行初始化：
