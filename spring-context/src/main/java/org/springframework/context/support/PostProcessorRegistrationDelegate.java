@@ -142,7 +142,7 @@ final class PostProcessorRegistrationDelegate {
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
-		/**
+		/**-------------------zgq----------------
 		* 获取实现了BeanFactoryPostProcessor接口的所有实现类
 		*/
 		String[] postProcessorNames =
@@ -150,33 +150,33 @@ final class PostProcessorRegistrationDelegate {
 
 		// Separate between BeanFactoryPostProcessors that implement PriorityOrdered,
 		// Ordered, and the rest.
-		/**
+		/**-------------------zgq----------------
 		 * 将BeanFactoryPostProcessor处理器分成几种来执行 priorityOrderedPostProcessors  orderedPostProcessorNames  nonOrderedPostProcessorNames
 		 */
 		List<BeanFactoryPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();
 		List<String> orderedPostProcessorNames = new ArrayList<>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
 
-		/**
+		/**-------------------zgq----------------
 		 * 遍历获得的所有的BeanFactoryPostProcessors
 		 */
 		for (String ppName : postProcessorNames) {
 			if (processedBeans.contains(ppName)) {
 				// skip - already processed in first phase above
 			}
-			/**
+			/**-------------------zgq----------------
 			 * 如果是实现了PriorityOrdered接口的话，添加到priorityOrderedPostProcessors集合中
 			 */
 			else if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				priorityOrderedPostProcessors.add(beanFactory.getBean(ppName, BeanFactoryPostProcessor.class));
 			}
-			/**
+			/**-------------------zgq----------------
 			 * 如果是实现了Ordered接口的话，添加到orderedPostProcessors集合中
 			 */
 			else if (beanFactory.isTypeMatch(ppName, Ordered.class)) {
 				orderedPostProcessorNames.add(ppName);
 			}
-			/**
+			/**-------------------zgq----------------
 			 * 剩下的就加到这个nonOrderedPostProcessorNames集合中
 			 */
 			else {

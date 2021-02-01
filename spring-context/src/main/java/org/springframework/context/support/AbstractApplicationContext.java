@@ -571,16 +571,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				/**-------------------------------------------------------------------------------
+				/**----------------zgq--------------
 				 * 执行BeanFactoryPostProcessor接口所有实现类的postProcessBeanFactory(factory)方法
 				 * 1)获取实现了BeanFactoryPostProcessor接口的所有实现类
 				 * 2)将BeanFactoryPostProcessor处理器分成几种来执行 （priorityOrdered  ordered  除了前面2种）
 				 * 3)执行invokeBeanFactoryPostProcessors()方法
+				 *
+				 * 注：springboot启动时会读取启动类上的注解完成自动装配，就是在这一行完成的
+				 *  1-有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
+				 *  2-调用getCandidateConfigurations()方法中的loadFactoryNames()方法，获取spring.factories文件中EnableAutoConfiguration下类的全类名
+				 *  3-进行过滤
+				 * 说明：获取到spring.factories文件中EnableAutoConfiguration下类的全类名后，这些类还没有进行实例化
 				*/
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				/**---------------------------------------------------------------
+				/**---------------zgq----------------
 				 * 实例化BeanPostProcessor的实现类，并注册到容器BeanPostProcessor中
 				 */
 				registerBeanPostProcessors(beanFactory);

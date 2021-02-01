@@ -190,6 +190,9 @@ class ConfigurationClassParser {
 			}
 		}
 
+		/**-------zgq------
+		 *
+		 */
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -247,6 +250,9 @@ class ConfigurationClassParser {
 		// Recursively process the configuration class and its superclass hierarchy.
 		SourceClass sourceClass = asSourceClass(configClass, filter);
 		do {
+			/**-------zgq-------
+			 * 解析springbooot启动类的注解
+			 */
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
 		}
 		while (sourceClass != null);
@@ -543,6 +549,10 @@ class ConfigurationClassParser {
 			for (SourceClass annotation : sourceClass.getAnnotations()) {
 				String annName = annotation.getMetadata().getClassName();
 				if (!annName.equals(Import.class.getName())) {
+					/**-------zgq------
+					 * 这里是递归
+					 * 获取springbooot启动类上的注解，识别@Import注解
+					 */
 					collectImports(annotation, imports, visited);
 				}
 			}
@@ -806,6 +816,9 @@ class ConfigurationClassParser {
 		public void processGroupImports() {
 			for (DeferredImportSelectorGrouping grouping : this.groupings.values()) {
 				Predicate<String> exclusionFilter = grouping.getCandidateFilter();
+				/**
+				 *
+				 */
 				grouping.getImports().forEach(entry -> {
 					ConfigurationClass configurationClass = this.configurationClasses.get(entry.getMetadata());
 					try {
