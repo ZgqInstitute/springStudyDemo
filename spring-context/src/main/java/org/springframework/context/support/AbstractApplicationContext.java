@@ -586,17 +586,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Invoke factory processors registered as beans in the context.
 				/**----------------zgq--------------
-				 * 执行所有BeanFactoryPostProcessor
-				 *   1)获取实现了BeanFactoryPostProcessor接口的所有实现类
-				 *   2)将BeanFactoryPostProcessor处理器分成几种来执行 （priorityOrdered  ordered  除了前面2种）
-				 *   3)执行invokeBeanFactoryPostProcessors()方法
+				 * 执行所有BeanFactoryPostProcessor：
+				 *     1- 先执行BeanDefinitionRegistryPostProcessor
+				 *          将BeanDefinitionRegistryPostProcessor处理器分成3种来执行
+				 *            1.1 先执行所有实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor实现类（springboot的自动装配就是在这执行！！！）
+				 *                  《注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，作用是：进行bean定义的加载 比如我们的包扫描，@import等》
+				 *                     (1) 有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
+				 *                     (1) 调用getCandidateConfigurations()方法中的loadFactoryNames()方法，获取spring.factories文件中EnableAutoConfiguration下类的全类名
+				 *                     (3) 进行过滤
+				 *                             说明：获取到spring.factories文件中EnableAutoConfiguration下类的全类名后，这些类还没有进行实例化
+				 *            1.2 再执行所有实现了Ordered接口的BeanDefinitionRegistryPostProcessor实现类
+				 *            1.3 最后执行没有实现任何优先级接口的BeanDefinitionRegistryPostProcessor
 				 *
-				 * 注：springboot启动时会读取启动类上的注解完成自动装配，就是在这一行完成的
-				 *   1-有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
-				 *   2-调用getCandidateConfigurations()方法中的loadFactoryNames()方法，获取spring.factories文件中EnableAutoConfiguration下类的全类名
-				 *   3-进行过滤
-				 * 说明：获取到spring.factories文件中EnableAutoConfiguration下类的全类名后，这些类还没有进行实例化
-				*/
+				 *     2- 再执行普通的BeanFactoryPostProcessor
+				 *          将普通的BeanFactoryPostProcessor处理器也分成3种来执行
+				 *            1.1 先执行所有实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor实现类
+				 *            1.2 再执行所有实现了Ordered接口的BeanDefinitionRegistryPostProcessor实现类
+				 *            1.3 最后执行没有实现任何优先级接口的BeanDefinitionRegistryPostProcessor
+				 *
+				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -804,6 +812,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		/**----zgq----
+		 * 1-getBeanFactoryPostProcessors()方法会获取到当前应用上下文中已经注册的 BeanFactoryPostProcessor
+		 * 2-invokeBeanFactoryPostProcessors()方法  实例化并调用所有已注册的BeanFactoryPostProcessor
+		 */
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
