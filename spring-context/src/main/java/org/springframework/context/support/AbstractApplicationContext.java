@@ -552,12 +552,26 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
+			/**------zgq------
+			 * 准备工作
+			 */
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			/**------zgq-----
+			 * 只有spring时做了2件事：
+			 *      1-创建容器对象DefaultListableBeanFactory
+			 *      2-通过loadBeanDefinitions()方法读取配置文件
+			 *
+			 * 注：>对于spring来说，对通过new DefaultListableBeanFactory()来创建容器；
+			 *     >对于springboot来说，因为在prepareContext()方法里，已经通过上下文对象获取到DefaultListableBeanFactory容器，所以不用重新创建直接获取就可以
+			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			/**------zgq------
+			 * 准备容器，给容器设置一些属性值
+			 */
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -572,15 +586,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Invoke factory processors registered as beans in the context.
 				/**----------------zgq--------------
-				 * 执行BeanFactoryPostProcessor接口所有实现类的postProcessBeanFactory(factory)方法
-				 * 1)获取实现了BeanFactoryPostProcessor接口的所有实现类
-				 * 2)将BeanFactoryPostProcessor处理器分成几种来执行 （priorityOrdered  ordered  除了前面2种）
-				 * 3)执行invokeBeanFactoryPostProcessors()方法
+				 * 执行所有BeanFactoryPostProcessor
+				 *   1)获取实现了BeanFactoryPostProcessor接口的所有实现类
+				 *   2)将BeanFactoryPostProcessor处理器分成几种来执行 （priorityOrdered  ordered  除了前面2种）
+				 *   3)执行invokeBeanFactoryPostProcessors()方法
 				 *
 				 * 注：springboot启动时会读取启动类上的注解完成自动装配，就是在这一行完成的
-				 *  1-有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
-				 *  2-调用getCandidateConfigurations()方法中的loadFactoryNames()方法，获取spring.factories文件中EnableAutoConfiguration下类的全类名
-				 *  3-进行过滤
+				 *   1-有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
+				 *   2-调用getCandidateConfigurations()方法中的loadFactoryNames()方法，获取spring.factories文件中EnableAutoConfiguration下类的全类名
+				 *   3-进行过滤
 				 * 说明：获取到spring.factories文件中EnableAutoConfiguration下类的全类名后，这些类还没有进行实例化
 				*/
 				invokeBeanFactoryPostProcessors(beanFactory);
@@ -592,23 +606,40 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
+				/**----zgq----
+				 * 国际化操作
+				 */
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
+				/**-----zgq-----
+				 * 注册多波器
+				 */
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				/**------zgq------
+				 * 对于springboot：这一步会创建web容器，tomcat就是在这一步进行初始化的
+				 */
 				onRefresh();
 
 				// Check for listener beans and register them.
+				/**-------zgq---------
+				 * 注册监听器。
+				 * 每一个监听器都有自己负责监听的事件
+				 */
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				/**------------------------------------------------------------------------
+				/**------zgq----------
 				 * 该方法做的事，debug进去最终会进入doCreateBean()方法，该方法主要做了如下事：
 				 *    1）调用createBeanInstance()方法通过反射实例化对象；
-				 *    2）调用populateBean()方法，填充属性；
-				 *    3) 调用initializeBean()方法，填充bean实现的xxxAware接口的属性 和 对bean进行初始化
+				 *    2）调用populateBean()方法，填充属性(循环依赖在这产生)；
+				 *    3) 调用initializeBean()方法
+				 *        3.1 填充bean实现的xxxAware接口的属性
+				 *        3.2 执行BeanPostProcessor的xxxBefore()方法
+				 *        3.3 对bean进行初始化
+				 *        3.4 执行BeanPostProcessor的xxxAfter()方法
 				 */
 				finishBeanFactoryInitialization(beanFactory);
 
@@ -768,7 +799,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
+	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,(实例化和执行所有已经注册的BeanFactoryPostProcessor)
 	 * respecting explicit order if given.
 	 * <p>Must be called before singleton instantiation.
 	 */
