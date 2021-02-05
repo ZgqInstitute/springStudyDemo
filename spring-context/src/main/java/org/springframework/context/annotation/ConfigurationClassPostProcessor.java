@@ -313,7 +313,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		// Return immediately if no @Configuration classes were found
 		/**-----zgq-----
-		 * 1.3 如果不存在配置类,则直接return
+		 * 判断启动类是否有@Configuration注解,没有就直接return
 		 */
 		if (configCandidates.isEmpty()) {
 			return;
@@ -372,6 +372,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		 */
 		do {
 			StartupStep processConfig = this.applicationStartup.start("spring.context.config-classes.parse");
+			/**-----zgq-----
+			 *  做的事：
+			 *    1-解析启动类上的@Configuration、@ComponentScan、@Import、@Bean等注解
+			 *    2-processDeferredImportSelectors()：获取类路径下META-INF下的spring.factories文件中EnableAutoConfiguration下类的全类名
+			 */
 			parser.parse(candidates);
 			parser.validate();
 

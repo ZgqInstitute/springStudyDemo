@@ -590,11 +590,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 *     1- 先执行BeanDefinitionRegistryPostProcessor
 				 *          将BeanDefinitionRegistryPostProcessor处理器分成3种来执行
 				 *            1.1 先执行所有实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor实现类（springboot的自动装配就是在这执行！！！）
-				 *                  《注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，作用是：进行bean定义的加载 比如我们的包扫描，@import等》
+				 *                  《注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，作用是：解析@Configuration、@ComponentScan、@Import、@Bean等注解》
 				 *                     (1) 有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
-				 *                     (1) 调用getCandidateConfigurations()方法中的loadFactoryNames()方法，获取spring.factories文件中EnableAutoConfiguration下类的全类名
+				 *                          doProcessConfigurationClass() —> processImports() —> getImports(sourceClass) —> collectImports(...)
+				 *                     (2) 处理刚刚通过@Import注解得到的类：AutoConfigurationImportSelector、AutoConfigurationPackage.Registrar
+				 *                          processDeferredImportSelectors() —> deferredImport.getImportSelector().selectImports() —> EnableAutoConfigurationImportSelector类的selectImports()方法 —>
+				 *                          getCandidateConfigurations() —> SpringFactoriesLoader.loadFactoryNames()
+				 *                          获取类路径下META-INF下的spring.factories文件中EnableAutoConfiguration下类的全类名
 				 *                     (3) 进行过滤
-				 *                             说明：获取到spring.factories文件中EnableAutoConfiguration下类的全类名后，这些类还没有进行实例化
+				 *                  《说明：获取到spring.factories文件中EnableAutoConfiguration下类的全类名后，这些类还没有进行实例化》
 				 *            1.2 再执行所有实现了Ordered接口的BeanDefinitionRegistryPostProcessor实现类
 				 *            1.3 最后执行没有实现任何优先级接口的BeanDefinitionRegistryPostProcessor
 				 *
@@ -603,7 +607,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 *            1.1 先执行所有实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor实现类
 				 *            1.2 再执行所有实现了Ordered接口的BeanDefinitionRegistryPostProcessor实现类
 				 *            1.3 最后执行没有实现任何优先级接口的BeanDefinitionRegistryPostProcessor
-				 *
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 

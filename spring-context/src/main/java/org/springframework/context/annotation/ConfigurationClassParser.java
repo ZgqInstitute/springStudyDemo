@@ -167,11 +167,16 @@ class ConfigurationClassParser {
 	}
 
 
+	/**-----zgq------
+	 * @param configCandidates springboot启动类
+	 */
 	public void parse(Set<BeanDefinitionHolder> configCandidates) {
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
+				//(ZGQ) 判断启动类是否是注解修饰的
 				if (bd instanceof AnnotatedBeanDefinition) {
+					//(ZGQ) 解析   parse(AnnotationMetadata,String)
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
 				else if (bd instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) bd).hasBeanClass()) {
@@ -251,7 +256,7 @@ class ConfigurationClassParser {
 		SourceClass sourceClass = asSourceClass(configClass, filter);
 		do {
 			/**-------zgq-------
-			 * 解析springbooot启动类的注解
+			 * 解析springboot启动类的注解
 			 */
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
 		}
@@ -314,6 +319,10 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @Import annotations
+		/**----zgq----
+		 * 解析启动类上的@Import注解
+		 *     进入getImports(sourceClass)方法
+		 */
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
 
 		// Process any @ImportResource annotations
@@ -525,6 +534,7 @@ class ConfigurationClassParser {
 	private Set<SourceClass> getImports(SourceClass sourceClass) throws IOException {
 		Set<SourceClass> imports = new LinkedHashSet<>();
 		Set<SourceClass> visited = new LinkedHashSet<>();
+		//(ZGQ)
 		collectImports(sourceClass, imports, visited);
 		return imports;
 	}
@@ -551,7 +561,7 @@ class ConfigurationClassParser {
 				if (!annName.equals(Import.class.getName())) {
 					/**-------zgq------
 					 * 这里是递归
-					 * 获取springbooot启动类上的注解，识别@Import注解
+					 *      获取springboot启动类上的注解，识别@Import注解
 					 */
 					collectImports(annotation, imports, visited);
 				}
