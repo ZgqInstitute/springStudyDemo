@@ -73,27 +73,33 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Maximum number of suppressed exceptions to preserve. */
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
-
+	//==================================================================================================================
+	//============================================循环依赖的三级缓存====================================================
+	// =================================================================================================================
 	/** Cache of singleton objects: bean name to bean instance. */
-	/**--------------------------------zgq----------------------------------
+	/**---ZGQ---
 	 *                    《一级缓存：singletonObjects  单例池》
 	 *  一级缓存放的是完整对象，key=beanName  value=完整对象(已经填充好属性)
 	 */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
-	/**--------------------------------zgq----------------------------------
+	/**---ZGQ---
 	 *                     《三级缓存：singletonFactories》
 	 * 三级缓存放的是lambda，key=beanName  value=lambda（存放可以生成Bean的工厂）
 	 */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
-	/**--------------------------------zgq----------------------------------
+	/**---ZGQ---
 	 *                  《二级缓存：earlySingletonObjects》
 	 * 二级缓存放的是半成品对象，key=beanName  value=半成品对象(完成实例化，但未完成初始化的对象)
 	 */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
+
+	//==================================================================================================================
+    //==================================================================================================================
+
 
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
@@ -206,17 +212,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
-		/**-------------zgq---------------
+		/**---ZGQ---
 		 * 从一级缓存singletonObjects中获取单例对象
 		 */
 		Object singletonObject = this.singletonObjects.get(beanName);
-		/**-------------------zgq------------------
+		/**---ZGQ---
 		 * 判断：一级缓存singletonObject中是否有单例对象
 		 *                      &&
 		 *      当前beanName对应的单例bean是否正在创建，其实就是判断当前三级缓存是否有正在创建的对象（注：此时bean不是正在创建，现在只是在容器中查找）
 		 */
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
-			/**-------------zgq---------------
+			/**---ZGQ---
 			 * 从二级缓存earlySingletonObjects中获取
 			 */
 			singletonObject = this.earlySingletonObjects.get(beanName);
@@ -227,18 +233,18 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (singletonObject == null) {
 						singletonObject = this.earlySingletonObjects.get(beanName);
 						if (singletonObject == null) {
-							/**-------------zgq---------------
+							/**---ZGQ---
 							 * 当一、二级缓存都没有，从三级缓存中获取
 							 * 这个singletonFactory是当初存进三级缓存的lambda表达式
 							 */
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							if (singletonFactory != null) {
 								singletonObject = singletonFactory.getObject();
-								/**-------------zgq---------------
+								/**---ZGQ---
 								 * 存入二级缓存， 注：二级缓存与三级缓存的对象不能同时存在
 								 */
 								this.earlySingletonObjects.put(beanName, singletonObject);
-								/**-------------zgq---------------
+								/**---ZGQ---
 								 * 从三级缓存中移除
 								 */
 								this.singletonFactories.remove(beanName);
@@ -305,8 +311,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					/**-------------------------zgq---------------------
-					 * 将创建好的bean放入Map
+					/**---ZGQ---
+					 * 将创建好的bean放入容器DefaultListableBeanFactory中
 					 * 将beanName和singletonObject的映射关系添加到容器的单例缓存中
 					 */
 					addSingleton(beanName, singletonObject);

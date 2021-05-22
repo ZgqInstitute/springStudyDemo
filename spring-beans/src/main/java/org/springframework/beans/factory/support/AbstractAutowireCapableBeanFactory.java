@@ -562,6 +562,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #instantiateUsingFactoryMethod
 	 * @see #autowireConstructor
 	 */
+
+	/**---ZGQ---
+	 * 这个方法很重要
+	 */
 	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
 			throws BeanCreationException {
 
@@ -571,13 +575,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			/**--------------------zgq-------------------------
+			/**---ZGQ---
 			 * 实例化方法 （通过反射进行实例化）
+			 * 注：这一步只是实例化对象，对象的属性还是为默认值，还没有进行属性的填充操作。
 			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
-		/**----------------------zgq------------------------
-		 * 这个bean已经实例化好了，但是现在所有的属性值都为空
+		/**---ZGQ---
+		 * 这个bean已经实例化好了，但是现在所有的属性值都为默认值
 		 */
 		Object bean = instanceWrapper.getWrappedInstance();
 		Class<?> beanType = instanceWrapper.getWrappedClass();
@@ -589,7 +594,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
-					/**----------------------------------------------------zgq--------------------------------------------------------------------
+					/**---ZGQ---
 					 *  这一步不懂？？？？？？？？？？？
 					 * 这一步的作用就是将所有的后置处理器(BeanPostProcessor)拿出来，并且把名字叫beanName的类中的变量都封装到
 					 * InjectionMetadata的injectedElements集合里面，目的是以后从中获取，挨个创建实例，通过反射注入到相应类中。
@@ -622,18 +627,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			/**--------------------zgq------------------------
-			 * 向三级缓存加 key：beanName   value：lambda表达式
+			/**---ZGQ---
+			 * 将上面实例化好还未完成初始化的对象先添加到三级缓存singletonFactories： key：beanName   value：lambda表达式
 			 *
 			 * 若有AOP，这一步会生成代理对象
 			 */
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+			//===========================================下面的写法要好理解一点==============================================
+			addSingletonFactory(beanName, new ObjectFactory<Object>() {
+				@Override
+				public Object getObject() throws BeansException {
+					return getEarlyBeanReference(beanName, mbd, bean);
+				}
+			});
+			//======================================================================================================
 		}
 
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
-			/**-------------------zgq---------------------------
+			/**---ZGQ---
 			 * 该方法做的事：
 			 *      （1）填充bean的自定义的属性(如：Person对象的name、age属性等)，会调用setxxx()方法（注：一定要有set()方法，否则会报错）
 			 *      （2）依赖注入 （  通过反射注入 field.set()  ）
@@ -643,7 +656,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
 
-			/**----------------------zgq---------------------------
+			/**---ZGQ---
 			 * 该方法的作用：
 			 * 		1：填充bean实现的xxxAware接口的属性。注：这里只填充BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
 			 * 	    2：对bean进行初始化：
@@ -1849,7 +1862,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
-			/**---------------------------------------------------------------------------------------------------
+			/**---ZGQ---
 			 * 填充bean实现的xxxAware接口的属性。注：这里只填充BeanNameAware、BeanClassLoaderAware、BeanFactoryAware
 			 */
 			invokeAwareMethods(beanName, bean);
@@ -1857,17 +1870,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
-			/**-----------------------------------------------------------
+			/**---ZGQ---
 			 * 这里会执行BeanPostProcessor的xxxbeforexxx()方法，
-			 * 其中执行的BeanPostProcessor各种的作用如下：
-			 *    1）ApplicationContextAwareProcessor，给bean填充aware属性
+			 * 有关BeanPostProcessor的实现类有哪些？实现类具体的功能又是什么？做如下总结：BeanPostProcessor的xxxbeforexxx()方法做的事：
+			 *    1）ApplicationContextAwareProcessor，给bean填充aware属性，会填充这6个Aware：EnvironmentAware、EmbeddedValueResolverAware、ResourceLoaderAware、ApplicationEventPublisherAware、MessageSourceAware、ApplicationContextAware
 			 *    2）
 			 */
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
-			/**--------------------------------------------------------------------------------
+			/**---ZGQ---
 			 * 调用初始化方法，先调用bean的InitializingBean接口的方法，后调用bean的自定义初始化方法
 			 */
 			invokeInitMethods(beanName, wrappedBean, mbd);
@@ -1878,8 +1891,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
-			/**----------------------------------------------
-			 *这里会执行BeanPostProcessor的xxxAfterxxx()方法
+			/**---ZGQ---
+			 * 这里会执行BeanPostProcessor的xxxAfterxxx()方法
+			 * 有关BeanPostProcessor的实现类有哪些？实现类具体的功能又是什么？做如下总结：BeanPostProcessor的xxxAfterxxx()方法做的事：
+			 *
 			 */
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}

@@ -561,7 +561,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			/**------zgq-----
 			 * 只有spring时做了2件事：
 			 *      1-创建容器对象DefaultListableBeanFactory
-			 *      2-通过loadBeanDefinitions()方法读取配置文件
+			 *      2-通过loadBeanDefinitions()方法读取配置文件，通过loadBeanDefinitions()方法将bean的定义信息BeanDefinition设置进容器的beanDefinitionMap和beanDefinitionNames属性中
 			 *
 			 * 注：>对于spring来说，对通过new DefaultListableBeanFactory()来创建容器；
 			 *     >对于springboot来说，因为在prepareContext()方法里，已经通过上下文对象获取到DefaultListableBeanFactory容器，所以不用重新创建直接获取就可以
@@ -576,11 +576,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				/**
+				/**---ZGQ---
 				* Bean如果实现了此接口，那么在容器初始化以后，Spring会负责调用里面的 postProcessBeanFactory() 方法。
-                * 这里是提供给子类的扩展点，到这里的时候，所有的 Bean 都加载、注册完成了，但是都还没有初始化
+                * 这里是提供给子类的扩展点，到这里的时候，所有的 Bean 都加载、注册完成了，但是都还没有初始化。
                 * 具体的子类可以在这步的时候根据自身业务添加或修改一些特殊的 beanFactory属性
-				*
 				*/
 				postProcessBeanFactory(beanFactory);
 
@@ -624,13 +623,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Initialize event multicaster for this context.
 				/**-----zgq-----
-				 * 注册多波器
+				 * 注册多播器
 				 */
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
 				/**------zgq------
-				 * 对于springboot：这一步会创建web容器，tomcat就是在这一步进行初始化的
+				 * 对于spring来说是个空方法；
+				 * 对于springboot来说这一步会创建web容器，tomcat就是在这一步进行初始化的
 				 */
 				onRefresh();
 
@@ -641,7 +641,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 */
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.
+				// Instantiate all remaining (non-lazy-init) singletons.（实例化所有非懒加载的单例对象）
 				/**------zgq----------
 				 * 该方法做的事，debug进去最终会进入doCreateBean()方法，该方法主要做了如下事：
 				 *    1）调用createBeanInstance()方法通过反射实例化对象；
@@ -1003,6 +1003,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		/**---ZGQ---
+		 * 对单例非懒加载的bean进行实例化
+		 */
 		beanFactory.preInstantiateSingletons();
 	}
 

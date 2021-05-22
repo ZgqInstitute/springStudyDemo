@@ -915,13 +915,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
-		/**----------------------------------------------------------
-		 * 获取到容器中所有的beanDefinitionNames，beanDefinitionNames里面存放的都是beanName
+		/**---ZGQ---
+		 * 获取容器中的beanDefinitionNames，beanDefinitionNames里面存放的是所有的beanName
 		 */
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
-		/**-----------------------------
+		/**---ZGQ---
 		 * 这个for会循环的创建bean
 		 */
 		for (String beanName : beanNames) {
@@ -947,7 +947,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
-					/**--------------
+					/**---ZGQ---
 					 * 创建bean
 					 */
 					getBean(beanName);

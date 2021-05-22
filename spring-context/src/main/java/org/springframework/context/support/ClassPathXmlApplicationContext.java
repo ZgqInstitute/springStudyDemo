@@ -138,8 +138,14 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 
+		/**---ZGQ---
+		 * 会创建StandardEnvironment对象，调用System.getProperties()和System.getEnv()两个方法得到系统属性值
+		 */
 		super(parent);
+
+		//ZGQ 设置xml文件的路径
 		setConfigLocations(configLocations);
+
 		if (refresh) {
 			refresh();
 		}

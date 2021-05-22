@@ -253,8 +253,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object beanInstance;
 
 		// Eagerly check singleton cache for manually registered singletons.
-		/**-------------------------------------------
-		 * 先看一级缓存中是否有单例对象
+		/**---ZGQ---
+		 * 先看一级缓存singletonObjects中是否有单例对象
 		 */
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
@@ -333,12 +333,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				if (mbd.isSingleton()) {
-					/**------------------------------
-					 * 这个方法将创建好的bean放入Map
+					/**---ZGQ---
+					 * 这个getSingleton()方法中的addSingleton()方法会将创建好的bean放入DefaultListableBeanFactory容器中
+					 *
+					 * 这个getSingleton()方法的第二个参数是个lambad表达式，当进入getSingleton()方法时，在getSingleton()内会调用一个getObject()方法，这个方法就是
+					 * getSingleton()方法第2个参数lambad表达式中的getObject()方法。  写的太妙了！！！
 					 */
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
-							/**------------------
+							/**---ZGQ---
 							 * 创建bean
 							 */
 							return createBean(beanName, mbd, args);
@@ -351,6 +354,24 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
+//======================================================下面这个写法好理解一点=======================================================================
+					sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
+						@Override
+						public Object getObject() throws BeansException {
+							try {
+								return createBean(beanName, mbd, args);
+							}
+							catch (BeansException ex) {
+								// Explicitly remove instance from singleton cache: It might have been put there
+								// eagerly by the creation process, to allow for circular reference resolution.
+								// Also remove any beans that received a temporary reference to the bean.
+								destroySingleton(beanName);
+								throw ex;
+							}
+						}
+					});
+//==================================================================================================================================================
+
 					beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 
