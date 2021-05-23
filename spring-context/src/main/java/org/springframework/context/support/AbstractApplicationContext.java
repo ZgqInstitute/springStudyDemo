@@ -562,6 +562,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 * 只有spring时做了2件事：
 			 *      1-创建容器对象DefaultListableBeanFactory
 			 *      2-通过loadBeanDefinitions()方法读取配置文件，通过loadBeanDefinitions()方法将bean的定义信息BeanDefinition设置进容器的beanDefinitionMap和beanDefinitionNames属性中
+			 *         其中beanDefinitionNames存放beanName;  beanDefinitionMap存放 <key = beanName  value = bean对应的BeanDefinition>
+			 *
 			 *
 			 * 注：>对于spring来说，对通过new DefaultListableBeanFactory()来创建容器；
 			 *     >对于springboot来说，因为在prepareContext()方法里，已经通过上下文对象获取到DefaultListableBeanFactory容器，所以不用重新创建直接获取就可以
@@ -584,7 +586,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				/**----------------zgq--------------
+				/**---ZGQ---
 				 * 执行所有BeanFactoryPostProcessor：
 				 *     1- 先执行BeanDefinitionRegistryPostProcessor
 				 *          将BeanDefinitionRegistryPostProcessor处理器分成3种来执行
@@ -610,39 +612,39 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				/**---------------zgq----------------
+				/**---ZGQ---
 				 * 实例化BeanPostProcessor的实现类，并注册到容器BeanPostProcessor中
 				 */
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
-				/**----zgq----
+				/**---ZGQ---
 				 * 国际化操作
 				 */
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
-				/**-----zgq-----
+				/**---ZGQ---
 				 * 注册多播器
 				 */
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
-				/**------zgq------
+				/**---ZGQ---
 				 * 对于spring来说是个空方法；
 				 * 对于springboot来说这一步会创建web容器，tomcat就是在这一步进行初始化的
 				 */
 				onRefresh();
 
 				// Check for listener beans and register them.
-				/**-------zgq---------
+				/**---ZGQ---
 				 * 注册监听器。
 				 * 每一个监听器都有自己负责监听的事件
 				 */
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.（实例化所有非懒加载的单例对象）
-				/**------zgq----------
+				/**---ZGQ---
 				 * 该方法做的事，debug进去最终会进入doCreateBean()方法，该方法主要做了如下事：
 				 *    1）调用createBeanInstance()方法通过反射实例化对象；
 				 *    2）调用populateBean()方法，填充属性(循环依赖在这产生)；
@@ -815,7 +817,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before singleton instantiation.
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		/**----zgq----
+		/**---ZGQ---
 		 * 1-getBeanFactoryPostProcessors()方法会获取到当前应用上下文中已经注册的 BeanFactoryPostProcessor
 		 * 2-invokeBeanFactoryPostProcessors()方法  实例化并调用所有已注册的BeanFactoryPostProcessor
 		 */

@@ -239,13 +239,20 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 							 */
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							if (singletonFactory != null) {
+								/**---ZGQ---
+								 * 《！！！！！！！！！！！！！！妙！！！ ！！！！！！！！！！》
+								 * 调用key=a 对应的lambda表达式中的getObject()方法获得a对象，这个a对象只是完成了实例化，还没有完成初始化
+								 *    注：
+								 *       1）若a对象有AOP，则调用getObject()中的getEarlyBeanReference()方法会返回A对象的代理对象；
+								 *       2）若a对象没有AOP，则调用getObject()中的getEarlyBeanReference()方法会返回A对象本身；
+								 */
 								singletonObject = singletonFactory.getObject();
 								/**---ZGQ---
-								 * 存入二级缓存， 注：二级缓存与三级缓存的对象不能同时存在
+								 * 将a对象存入二级缓存，此时的a对象只完成了实例化还未完成初始化（a对象的属性还没有填充） 注：二级缓存与三级缓存的对象不能同时存在
 								 */
 								this.earlySingletonObjects.put(beanName, singletonObject);
 								/**---ZGQ---
-								 * 从三级缓存中移除
+								 * 将a对象从三级缓存中移除
 								 */
 								this.singletonFactories.remove(beanName);
 							}

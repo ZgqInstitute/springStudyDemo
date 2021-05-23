@@ -1029,20 +1029,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @return the object to expose as bean reference
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
-		/**-----------zgq----------
+		/**---ZGQ---
 		 * 这个bean对象是被代理的对象，将被代理的对象赋值给exposedObject，提前暴露对象
 		 */
 		Object exposedObject = bean;
+
+        /**---ZGQ---
+         * 若参数中的bean没有AOP，那么就不会进入if，直接返回bean本身；
+         * 若参数中的bean有AOP，那么就会进入if，返回bean的代理对象；
+         */
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
-				/**-----------zgq----------
+				/**---ZGQ---
 				 * 对被代理对象进行包装，返回代理对象。  点进方法最终会调用到Proxy.newProxyInstance(参数1,参数2,参数3)方法
 				 */
 				exposedObject = bp.getEarlyBeanReference(exposedObject, beanName);
 			}
 		}
 
-		/**-----------zgq----------
+		/**---ZGQ---
 		 * ->若没有AOP，这里直接返回exposedObject
 		 * ->若有AOP，这里会返回对被代理对象包装过得对象（代理对象）
 		 */
