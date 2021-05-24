@@ -110,7 +110,7 @@ final class PostProcessorRegistrationDelegate {
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			//(ZGQ) 加入到用于保存到registryProcessors中(用于最后执行postProcessBeanFactory方法)
 			registryProcessors.addAll(currentRegistryProcessors);
-			/**-----zgq-----
+			/**---ZGQ---
 			* 遍历currentRegistryProcessors集合, 执行postProcessBeanDefinitionRegistry()方法
 			*     注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，作用是：进行bean定义的加载 比如我们的包扫描，@import等
 			*/

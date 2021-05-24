@@ -552,26 +552,26 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
-			/**------zgq------
+			/**---ZGQ---
 			 * 准备工作
 			 */
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			/**------zgq-----
+			/**---ZGQ---
 			 * 只有spring时做了2件事：
 			 *      1-创建容器对象DefaultListableBeanFactory
 			 *      2-通过loadBeanDefinitions()方法读取配置文件，通过loadBeanDefinitions()方法将bean的定义信息BeanDefinition设置进容器的beanDefinitionMap和beanDefinitionNames属性中
 			 *         其中beanDefinitionNames存放beanName;  beanDefinitionMap存放 <key = beanName  value = bean对应的BeanDefinition>
 			 *
 			 *
-			 * 注：>对于spring来说，对通过new DefaultListableBeanFactory()来创建容器；
+			 * 注：>对于spring来说，实在这一步通过new DefaultListableBeanFactory()来创建容器；
 			 *     >对于springboot来说，因为在prepareContext()方法里，已经通过上下文对象获取到DefaultListableBeanFactory容器，所以不用重新创建直接获取就可以
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			/**------zgq------
+			/**---ZGQ---
 			 * 准备容器，给容器设置一些属性值
 			 */
 			prepareBeanFactory(beanFactory);
@@ -582,6 +582,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				* Bean如果实现了此接口，那么在容器初始化以后，Spring会负责调用里面的 postProcessBeanFactory() 方法。
                 * 这里是提供给子类的扩展点，到这里的时候，所有的 Bean 都加载、注册完成了，但是都还没有初始化。
                 * 具体的子类可以在这步的时候根据自身业务添加或修改一些特殊的 beanFactory属性
+				*
+				* 注：>对于spring来说，这一行代码是空的；
+				*     >对于springboot来说，会向容器中添加BeanPostProcessor
 				*/
 				postProcessBeanFactory(beanFactory);
 
