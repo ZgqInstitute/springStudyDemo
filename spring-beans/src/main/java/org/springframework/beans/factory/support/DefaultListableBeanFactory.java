@@ -950,7 +950,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					/**---ZGQ---
 					 * 创建bean
 					 */
-					getBean(beanName);
+9					getBean(beanName);
 				}
 			}
 		}

@@ -93,7 +93,14 @@ final class PostProcessorRegistrationDelegate {
 
 			//================================================1-调用所有实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor实现类========================================================================
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
-			//(ZGQ) 从容器中查出所有实现了BeanDefinitionRegistryPostProcessor接口的bean名称
+			/**---ZGQ---
+			 * 从容器中查出所有实现了BeanDefinitionRegistryPostProcessor接口的bean名称
+			 *
+			 * 注：这里不是直接得到ConfigurationClassPostProcessor，而是得到internalConfigurationAnnotationProcessor，
+			 *     而internalConfigurationAnnotationProcessor在AnnotationConfigUtils这个类中，在AnnotationConfigUtils类中添加ConfigurationClassPostProcessor
+			 *
+			 *     ConfigurationClassPostProcessor实现了BeanFactoryPostProcessor和PriorityOrdered接口
+			 */
 			String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 
 			for (String ppName : postProcessorNames) {

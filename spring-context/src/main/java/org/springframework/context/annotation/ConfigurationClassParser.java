@@ -166,15 +166,14 @@ class ConfigurationClassParser {
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, resourceLoader);
 	}
 
-
-	/**-----zgq------
+	/**---ZGQ---
 	 * @param configCandidates springboot启动类
 	 */
 	public void parse(Set<BeanDefinitionHolder> configCandidates) {
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
-				//(ZGQ) 判断启动类是否是注解修饰的
+				//(ZGQ) 判断springboot启动类是否是注解修饰的
 				if (bd instanceof AnnotatedBeanDefinition) {
 					//(ZGQ) 解析   parse(AnnotationMetadata,String)
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
@@ -195,8 +194,9 @@ class ConfigurationClassParser {
 			}
 		}
 
-		/**-------zgq------
-		 *
+		/**----ZGQ---
+		 * 上面if内的paese()方法是获取到springboot启动类上@Import注解内的类，
+		 * 下面这个deferredImportSelectorHandler.process()方法是对@Import注解内的类进行处理
 		 */
 		this.deferredImportSelectorHandler.process();
 	}
@@ -208,6 +208,7 @@ class ConfigurationClassParser {
 	}
 
 	protected final void parse(Class<?> clazz, String beanName) throws IOException {
+		//ZGQ
 		processConfigurationClass(new ConfigurationClass(clazz, beanName), DEFAULT_EXCLUSION_FILTER);
 	}
 
@@ -797,6 +798,9 @@ class ConfigurationClassParser {
 					DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
 					deferredImports.sort(DEFERRED_IMPORT_COMPARATOR);
 					deferredImports.forEach(handler::register);
+					/**---ZGQ---
+					 * 进入这个方法
+					 */
 					handler.processGroupImports();
 				}
 			}
@@ -826,8 +830,8 @@ class ConfigurationClassParser {
 		public void processGroupImports() {
 			for (DeferredImportSelectorGrouping grouping : this.groupings.values()) {
 				Predicate<String> exclusionFilter = grouping.getCandidateFilter();
-				/**
-				 *
+				/**---ZGQ---
+				 * 进入getImports()方法
 				 */
 				grouping.getImports().forEach(entry -> {
 					ConfigurationClass configurationClass = this.configurationClasses.get(entry.getMetadata());
