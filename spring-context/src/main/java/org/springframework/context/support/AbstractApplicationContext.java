@@ -628,12 +628,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Initialize event multicaster for this context.
 				/**---ZGQ---
+				 * https://blog.csdn.net/weixin_44420511/article/details/125263844?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default
 				 * 注册多播器
 				 */
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
 				/**---ZGQ---
+				 * https://blog.csdn.net/weixin_44420511/article/details/125263844?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default
 				 * 对于spring来说是个空方法；
 				 * 对于springboot来说这一步会创建web容器，tomcat就是在这一步进行初始化的
 				 */
