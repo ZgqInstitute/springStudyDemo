@@ -565,7 +565,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 *         其中beanDefinitionNames存放beanName;  beanDefinitionMap存放 <key = beanName  value = bean对应的BeanDefinition>
 			 *
 			 *
-			 * 注：>对于spring来说，实在这一步通过new DefaultListableBeanFactory()来创建容器；
+			 * 注：>对于spring来说，是在这一步通过new DefaultListableBeanFactory()来创建容器；
 			 *     >对于springboot来说，因为在prepareContext()方法里，已经通过上下文对象获取到DefaultListableBeanFactory容器，所以不用重新创建直接获取就可以
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
@@ -600,9 +600,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 *                     (2) 处理刚刚通过@Import注解得到的类：AutoConfigurationImportSelector、AutoConfigurationPackage.Registrar
 				 *                          processDeferredImportSelectors() —> deferredImport.getImportSelector().selectImports() —> EnableAutoConfigurationImportSelector类的selectImports()方法 —>
 				 *                          getCandidateConfigurations() —> SpringFactoriesLoader.loadFactoryNames()
-				 *                          获取类路径下META-INF下的spring.factories文件中EnableAutoConfiguration下类的全类名
+				 *                          获取类路径下META-INF下的spring.factories文件中EnableAutoConfiguration下类的全限定类名
 				 *                     (3) 进行过滤
-				 *                  《说明：获取到spring.factories文件中EnableAutoConfiguration下类的全类名后，这些类还没有进行实例化》
+				 *                  《说明：获取到spring.factories文件中EnableAutoConfiguration下类的全限定类名后，这些类还没有进行实例化》
 				 *            1.2 再执行所有实现了Ordered接口的BeanDefinitionRegistryPostProcessor实现类
 				 *            1.3 最后执行没有实现任何优先级接口的BeanDefinitionRegistryPostProcessor
 				 *
