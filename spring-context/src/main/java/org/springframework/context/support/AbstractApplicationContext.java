@@ -608,9 +608,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 *
 				 *     2- 再执行普通的BeanFactoryPostProcessor
 				 *          将普通的BeanFactoryPostProcessor处理器也分成3种来执行
-				 *            1.1 先执行所有实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor实现类
-				 *            1.2 再执行所有实现了Ordered接口的BeanDefinitionRegistryPostProcessor实现类
-				 *            1.3 最后执行没有实现任何优先级接口的BeanDefinitionRegistryPostProcessor
+				 *            1.1 先执行所有实现了PriorityOrdered接口的BeanFactoryPostProcessor实现类
+				 *            1.2 再执行所有实现了Ordered接口的BeanFactoryPostProcessor实现类
+				 *            1.3 最后执行没有实现任何优先级接口的BeanFactoryPostProcessor
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
@@ -630,6 +630,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				/**---ZGQ---
 				 * https://blog.csdn.net/weixin_44420511/article/details/125263844?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default
 				 * 注册多播器
+                 * 1-创建一个ApplicationEventMulticaster(SimpleApplicationEventMulticaster)对象并通过registerSingleton注册到Spring容器中，方便后面使用
+                 * 2-将实现了ApplicationListener的监听器注册到ApplicationEventMulticaster
+                 * 3-
 				 */
 				initApplicationEventMulticaster();
 
