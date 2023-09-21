@@ -215,7 +215,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Nullable
 	private Thread shutdownHook;
 
-	/** ResourcePatternResolver used by this context. */
+	//=====================================祝光泉==========================================
+	//=======================AbstractApplicationContext有的属性============================
+
+	/**
+	 * ZGQ资源加载器。ResourcePatternResolver used by this context.
+	 * 在创建AbstractApplicationContext时就给resourcePatternResolver属性赋值
+	 */
 	private ResourcePatternResolver resourcePatternResolver;
 
 	/** LifecycleProcessor for managing the lifecycle of beans within this context. */
@@ -247,6 +253,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * Create a new AbstractApplicationContext with no parent.
+	 * 在创建AbstractApplicationContext时，就创建资源加载器ResourcePatternResolver
 	 */
 	public AbstractApplicationContext() {
 		this.resourcePatternResolver = getResourcePatternResolver();
@@ -566,7 +573,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			 *
 			 *
 			 * 注：>对于spring来说，是在这一步通过new DefaultListableBeanFactory()来创建容器；
-			 *     >对于springboot来说，因为在prepareContext()方法里，已经通过上下文对象获取到DefaultListableBeanFactory容器，所以不用重新创建直接获取就可以
+			 *     >对于springboot来说，是在createApplicationContext()方法内创建spring容器的，所以这里不用重新创建直接获取就可以
 			 */
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -665,6 +672,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
+				/**---ZGQ---
+				 * 会调用监听了ContextRefreshedEvent事件的监听器
+				 */
 				finishRefresh();
 			}
 

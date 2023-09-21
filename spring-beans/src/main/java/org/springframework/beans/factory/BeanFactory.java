@@ -28,9 +28,9 @@ import org.springframework.lang.Nullable;
  * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}
  * are available for specific purposes.
  *
- * <p>This interface is implemented by objects that hold a number of bean definitions,
- * each uniquely identified by a String name. Depending on the bean definition,
- * the factory will return either an independent instance of a contained object
+ * <p>This interface is implemented by objects that hold a number of bean definitions（保存了很多bean的定义消息）,
+ * each uniquely identified by a String name(每个bean都有一个唯一的name). Depending on the bean definition,
+ * the factory will return either an independent(独立的) instance of a contained object
  * (the Prototype design pattern), or a single shared instance (a superior
  * alternative to the Singleton design pattern, in which the instance is a
  * singleton in the scope of the factory). Which type of instance will be returned
