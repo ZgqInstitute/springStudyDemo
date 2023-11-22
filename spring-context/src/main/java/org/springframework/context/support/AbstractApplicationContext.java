@@ -553,6 +553,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
+	/**
+	 * 《《《《《《《《最重要的refresh()方法》》》》》》》》》》
+	 */
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
@@ -598,14 +601,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Invoke factory processors registered as beans in the context.
 				/**---ZGQ---
 				 * 执行所有BeanFactoryPostProcessor：
-				 *     1- 先执行BeanDefinitionRegistryPostProcessor
+				 *     0- 先创建BeanFactoryPostProcessor
+				 *     1- 再执行BeanDefinitionRegistryPostProcessor
 				 *          将BeanDefinitionRegistryPostProcessor处理器分成3种来执行
 				 *            1.1 先执行所有实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor实现类（springboot的自动装配就是在这执行！！！）
-				 *                  《注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，作用是：解析@Configuration、@ComponentScan、@Import、@Bean等注解》
-				 *                     (1) 有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
+				 *                  《注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，作用是：
+				 *                       解析@Configuration、@ComponentScan、@Import、@Bean等注解》
+				 *                     (1) 有个collectImports()方法会递归解析启动类上的@Import注解，解析完后会得到2个结果(
+				 *                          EnableAutoConfigurationImportSelector、AutoConfigurationPackage.Registrar)
 				 *                          doProcessConfigurationClass() —> processImports() —> getImports(sourceClass) —> collectImports(...)
 				 *                     (2) 处理刚刚通过@Import注解得到的类：AutoConfigurationImportSelector、AutoConfigurationPackage.Registrar
-				 *                          processDeferredImportSelectors() —> deferredImport.getImportSelector().selectImports() —> EnableAutoConfigurationImportSelector类的selectImports()方法 —>
+				 *                          processDeferredImportSelectors() —> deferredImport.getImportSelector().selectImports() —>
+				 *                          EnableAutoConfigurationImportSelector类的selectImports()方法 —>
 				 *                          getCandidateConfigurations() —> SpringFactoriesLoader.loadFactoryNames()
 				 *                          获取类路径下META-INF下的spring.factories文件中EnableAutoConfiguration下类的全限定类名
 				 *                     (3) 进行过滤

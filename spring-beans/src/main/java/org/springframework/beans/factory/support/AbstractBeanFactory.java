@@ -313,6 +313,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.
+				/**---ZGQ---
+				 * 看当前Bean有没有依赖其他bean
+				 */
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
@@ -354,7 +357,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
+//=============================================================祝光泉================================================================================
 //======================================================下面这个写法好理解一点=======================================================================
+//==================================================================================================================================================
 					sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
 						@Override
 						public Object getObject() throws BeansException {
@@ -371,6 +376,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						}
 					});
 //==================================================================================================================================================
+//==================================================================================================================================================
+//==================================================================================================================================================
+
 
 					beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}

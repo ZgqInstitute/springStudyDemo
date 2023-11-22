@@ -923,17 +923,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
 		/**---ZGQ---
-		 * 获取容器中的beanDefinitionNames，beanDefinitionNames里面存放的是所有的beanName
+		 * beanNames就是DefaultListableBeanFactory对象的beanDefinitionNames属性，
+		 * beanDefinitionNames里面存放的是所有的beanName
 		 */
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
 		/**---ZGQ---
-		 * 这个for会循环的创建bean
+		 * 这个for会循环的创建bean, 依次遍历bean工厂的beanName
 		 */
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				/**--ZGQ--
+				 * 判断bean是否实现了FactoryBean接口，若是，则走if内的逻辑
+				 * 因为实现了FactoryBean接口的bean，向容器中注入的不是bean本身，而是getObject()方法内返回的对象
+				 */
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
@@ -955,7 +960,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				else {
 					/**---ZGQ---
-					 * 创建bean
+					 * 没有实现FactoryBean接口的bean,就是普通的bean走else创建bean
 					 */
 9					getBean(beanName);
 				}

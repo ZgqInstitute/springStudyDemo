@@ -238,7 +238,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
-		/**---zgq----
+		/**祝光泉
 		 *根据BeanDefinitionRegistry,生成registryId 加入到registriesPostProcessed中.registriesPostProcessed是为了做去重的判断,
 		 *当重复对一个BeanDefinitionRegistry进行处理时,则会抛出IllegalStateException.
 		 */
@@ -253,7 +253,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
 
-		/**------zgq------
+		/**祝光泉
 		 * 这个方法做了7件事：
 		 *  1-获取已经注册的bean名称,进行遍历
 		 */
@@ -287,8 +287,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * {@link Configuration} classes.
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
+		// 祝光泉。遍历bean的定义，若是配置类的bean，则加入到configCandidates集合
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
-		/**----zgq----
+		/**祝光泉
 		 * 1. 获取已经注册的bean名称
 		 */
 		String[] candidateNames = registry.getBeanDefinitionNames();
@@ -296,14 +297,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		for (String beanName : candidateNames) {
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
 			if (beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE) != null) {
-				/**-----zgq-----
+				/**祝光泉
 				 * 1.1. 如果BeanDefinition 中的configurationClass 属性为full 或者lite ,则意味着已经处理过了,直接跳过
 				 */
 				if (logger.isDebugEnabled()) {
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
-			/**-----zgq-----
+			/**祝光泉
 			 * 1.2. 判断对应bean是否为配置类,如果是,则加入到configCandidates
 			 */
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
@@ -312,7 +313,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Return immediately if no @Configuration classes were found
-		/**-----zgq-----
+		/**祝光泉
 		 * 判断启动类是否有@Configuration注解,没有就直接return
 		 */
 		if (configCandidates.isEmpty()) {
@@ -320,7 +321,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Sort by previously determined @Order value, if applicable
-		/**-----zgq-----
+		/**祝光泉
 		 * 2. 对configCandidates 进行排序,按照@Order 配置的值进行排序
 		 */
 		configCandidates.sort((bd1, bd2) -> {
@@ -330,7 +331,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		});
 
 		// Detect any custom bean name generation strategy supplied through the enclosing application context
-		/**-----zgq-----
+		/**祝光泉
 		 * 3. 如果BeanDefinitionRegistry是SingletonBeanRegistry子类的话,由于我们当前传入的是DefaultListableBeanFactory,是SingletonBeanRegistry 的子类。
 		 *    因此会将registry强转为SingletonBeanRegistry
 		 */
@@ -338,7 +339,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		if (registry instanceof SingletonBeanRegistry) {
 			sbr = (SingletonBeanRegistry) registry;
 			if (!this.localBeanNameGeneratorSet) {
-				/**------zgq------
+				/**祝光泉
 				 * 如果localBeanNameGeneratorSet等于false并且SingletonBeanRegistry中有id为org.springframework.context.annotation.internalConfigurationBeanNameGenerator的bean
 				 * 则将componentScanBeanNameGenerator,importBeanNameGenerator赋值为该bean.
 				 */
@@ -355,24 +356,24 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Parse each @Configuration class
-		/**-----zgq-----
+		/**祝光泉
 		 * 4. 实例化ConfigurationClassParser 为了解析 各个配置类
 		 */
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
 
-		/**-----zgq-----
+		/**祝光泉
 		 * 实例化2个set,candidates 用于将之前加入的configCandidates 进行去重    alreadyParsed 用于判断是否处理过
 		 */
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
-		/**-----zgq-----
+		/**祝光泉
 		 * 5. 进行解析
 		 */
 		do {
 			StartupStep processConfig = this.applicationStartup.start("spring.context.config-classes.parse");
-			/**-----zgq-----
+			/**祝光泉
 			 *  做的事：
 			 *    1-解析启动类上的@Configuration、@ComponentScan、@Import、@Bean等注解
 			 *    2-processDeferredImportSelectors()：获取类路径下META-INF下的spring.factories文件中EnableAutoConfiguration下类的全类名

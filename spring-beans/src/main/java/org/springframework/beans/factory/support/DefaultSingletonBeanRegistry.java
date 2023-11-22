@@ -77,21 +77,21 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	//============================================循环依赖的三级缓存====================================================
 	// =================================================================================================================
 	/** Cache of singleton objects: bean name to bean instance. */
-	/**---ZGQ---
+	/**祝光泉
 	 *                    《一级缓存：singletonObjects  单例池》
 	 *  一级缓存放的是完整对象，key=beanName  value=完整对象(已经填充好属性)
 	 */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
-	/**---ZGQ---
+	/**祝光泉
 	 *                     《三级缓存：singletonFactories》
 	 * 三级缓存放的是lambda，key=beanName  value=lambda（存放可以生成Bean的工厂）
 	 */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
-	/**---ZGQ---
+	/**祝光泉
 	 *                  《二级缓存：earlySingletonObjects》
 	 * 二级缓存放的是半成品对象，key=beanName  value=半成品对象(完成实例化，但未完成初始化的对象)
 	 */
@@ -154,15 +154,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
-			/**------------------zgq-----------------
+			/**祝光泉
 			 * 将创建好的bean(B对象)放入一级缓存singletonObjects   Map:key=beanName  value=B对象(此时B的A属性已经填充完成)
 			 */
 			this.singletonObjects.put(beanName, singletonObject);
-			/**----------zgq------------
+			/**祝光泉
 			 * 移除三级缓存中的b
 			 */
 			this.singletonFactories.remove(beanName);
-			/**----------zgq-----------
+			/**祝光泉
 			 * 移除二级缓存中的b
 			 */
 			this.earlySingletonObjects.remove(beanName);
@@ -212,17 +212,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
-		/**---ZGQ---
+		/**祝光泉
 		 * 从一级缓存singletonObjects中获取单例对象
 		 */
 		Object singletonObject = this.singletonObjects.get(beanName);
-		/**---ZGQ---
+		/**祝光泉
 		 * 判断：一级缓存singletonObject中是否有单例对象
 		 *                      &&
 		 *      当前beanName对应的单例bean是否正在创建，其实就是判断当前三级缓存是否有正在创建的对象（注：此时bean不是正在创建，现在只是在容器中查找）
 		 */
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
-			/**---ZGQ---
+			/**祝光泉
 			 * 从二级缓存earlySingletonObjects中获取
 			 */
 			singletonObject = this.earlySingletonObjects.get(beanName);
@@ -233,13 +233,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (singletonObject == null) {
 						singletonObject = this.earlySingletonObjects.get(beanName);
 						if (singletonObject == null) {
-							/**---ZGQ---
+							/**祝光泉
 							 * 当一、二级缓存都没有，从三级缓存中获取
 							 * 这个singletonFactory是当初存进三级缓存的lambda表达式
 							 */
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							if (singletonFactory != null) {
-								/**---ZGQ---
+								/**祝光泉
 								 * 《！！！！！！！！！！！！！！妙！！！ ！！！！！！！！！！》
 								 * 调用key=a 对应的lambda表达式中的getObject()方法获得a对象，这个a对象只是完成了实例化，还没有完成初始化
 								 *    注：
@@ -247,11 +247,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 								 *       2）若a对象没有AOP，则调用getObject()中的getEarlyBeanReference()方法会返回A对象本身；
 								 */
 								singletonObject = singletonFactory.getObject();
-								/**---ZGQ---
+								/**祝光泉
 								 * 将a对象存入二级缓存，此时的a对象只完成了实例化还未完成初始化（a对象的属性还没有填充） 注：二级缓存与三级缓存的对象不能同时存在
 								 */
 								this.earlySingletonObjects.put(beanName, singletonObject);
-								/**---ZGQ---
+								/**祝光泉
 								 * 将a对象从三级缓存中移除
 								 */
 								this.singletonFactories.remove(beanName);
@@ -292,6 +292,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					/**祝光泉
+					 * 这里的singletonFactory.getObject()就是调用AbstractBeanFactory中的getSingleton()方法第二个参数lambad表达式中的方法
+					 */
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -318,7 +321,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					/**---ZGQ---
+					/**祝光泉
 					 * 将创建好的bean放入容器DefaultListableBeanFactory中
 					 * 将beanName和singletonObject的映射关系添加到容器的单例缓存中
 					 */
