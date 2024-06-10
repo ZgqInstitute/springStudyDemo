@@ -287,10 +287,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * {@link Configuration} classes.
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
-		// 祝光泉。遍历bean的定义，若是配置类的bean，则加入到configCandidates集合
+		// 祝光泉。遍历bean的定义，若是配置类的bean(加了@Configuration注解的类)，则加入到configCandidates集合
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
 		/**祝光泉
-		 * 1. 获取已经注册的bean名称
+		 * 祝光泉Q：从PostProcessorRegistrationDelegate的BeanDefinitionRegistryPostProcessor的First进来，
+		 *         执行这一步会得到框架自带的BeanDefinition的name和配置类(加了@Configuration注解的类)的BeanDefinition的name，
+		 *         这里为什么会得到配置类的BeanDefinition的name？配置类的BeanDefinition在哪里放入容器的？
+		 * 祝光泉A：
+		 *
 		 */
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
@@ -305,7 +309,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				}
 			}
 			/**祝光泉
-			 * 1.2. 判断对应bean是否为配置类,如果是,则加入到configCandidates
+			 * 1.2. 判断对应bean是否为配置类,如果是,则加入到configCandidates。这里只有配置类的BeanDefinition(加了@Configuration注解的类)
+			 *      才会进入这个else if
 			 */
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
@@ -313,9 +318,6 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Return immediately if no @Configuration classes were found
-		/**祝光泉
-		 * 判断启动类是否有@Configuration注解,没有就直接return
-		 */
 		if (configCandidates.isEmpty()) {
 			return;
 		}

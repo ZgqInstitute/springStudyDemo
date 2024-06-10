@@ -160,12 +160,22 @@ public abstract class AnnotationConfigUtils {
 
 		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
 
+		/**祝光泉
+		 * 在这里向容器注入ConfigurationClassPostProcessor的beanDefinition
+		 * beanName = org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+		 * BeanDefinition = ConfigurationClassPostProcessor
+		 */
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
 
+		/**祝光泉
+		 * 在这里向容器注入AutowiredAnnotationBeanPostProcessor的beanDefinition
+		 * beanName = org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+		 * BeanDefinition = AutowiredAnnotationBeanPostProcessor
+		 */
 		if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
 			def.setSource(source);

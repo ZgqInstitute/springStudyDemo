@@ -562,13 +562,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
-			/**---ZGQ---
+			/**-祝光泉
 			 * 准备工作
 			 */
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			/**---ZGQ---
+			/**-祝光泉
 			 * 只有spring时做了2件事：
 			 *      1-创建容器对象DefaultListableBeanFactory
 			 *      2-通过loadBeanDefinitions()方法读取配置文件，通过loadBeanDefinitions()方法将bean的定义信息BeanDefinition设置进容器的beanDefinitionMap和beanDefinitionNames属性中
@@ -581,14 +581,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			/**---ZGQ---
+			/**-祝光泉
 			 * 准备容器，给容器设置一些属性值
 			 */
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				/**---ZGQ---
+				/**祝光泉
 				* Bean如果实现了此接口，那么在容器初始化以后，Spring会负责调用里面的 postProcessBeanFactory() 方法。
                 * 这里是提供给子类的扩展点，到这里的时候，所有的 Bean 都加载、注册完成了，但是都还没有初始化。
                 * 具体的子类可以在这步的时候根据自身业务添加或修改一些特殊的 beanFactory属性
@@ -599,7 +599,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				/**---ZGQ---
+				/**祝光泉
 				 * 执行所有BeanFactoryPostProcessor：
 				 *     0- 先创建BeanFactoryPostProcessor
 				 *     1- 再执行BeanDefinitionRegistryPostProcessor
@@ -629,19 +629,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				/**---ZGQ---
-				 * 实例化BeanPostProcessor的实现类，并注册到容器BeanPostProcessor中
+				/**祝光泉
+				 * 实例化BeanPostProcessor的实现类(包括框架自带和自定义的)，并注册到容器BeanPostProcessor中
 				 */
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
-				/**---ZGQ---
+				/**祝光泉
 				 * 国际化操作
 				 */
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
-				/**---ZGQ---
+				/**祝光泉
 				 * https://blog.csdn.net/weixin_44420511/article/details/125263844?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default
 				 * 注册多播器
                  * 1-创建一个ApplicationEventMulticaster(SimpleApplicationEventMulticaster)对象并通过registerSingleton注册到Spring容器中，方便后面使用
@@ -651,7 +651,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
-				/**---ZGQ---
+				/**祝光泉
 				 * https://blog.csdn.net/weixin_44420511/article/details/125263844?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1-125263844-blog-114712852.pc_relevant_default
 				 * 对于spring来说是个空方法；
 				 * 对于springboot来说这一步会创建web容器，tomcat就是在这一步进行初始化的
@@ -659,14 +659,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				onRefresh();
 
 				// Check for listener beans and register them.
-				/**---ZGQ---
+				/**祝光泉
 				 * 注册监听器。
 				 * 每一个监听器都有自己负责监听的事件
 				 */
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.（实例化所有非懒加载的单例对象）
-				/**---ZGQ---
+				/**祝光泉
 				 * 该方法做的事，debug进去最终会进入doCreateBean()方法，该方法主要做了如下事：
 				 *    1）调用createBeanInstance()方法通过反射实例化对象；
 				 *    2）调用populateBean()方法，填充属性(循环依赖在这产生)；
@@ -679,7 +679,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
-				/**---ZGQ---
+				/**祝光泉
 				 * 会调用监听了ContextRefreshedEvent事件的监听器
 				 */
 				finishRefresh();

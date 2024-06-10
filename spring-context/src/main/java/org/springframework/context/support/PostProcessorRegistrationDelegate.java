@@ -97,15 +97,18 @@ final class PostProcessorRegistrationDelegate {
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
 			/**---祝光泉---
-			 * Q：为什么这一步得到的beanName是org.springframework.context.annotation.internalConfigurationAnnotationProcessor？
-			 * A：
+			 * 祝光泉Q：为什么这一步得到的beanName是org.springframework.context.annotation.internalConfigurationAnnotationProcessor？
+			 * 祝光泉A：因为在创建容器(new AnnotationConfigApplicationContext())时，就向容器中注册(调用registry.registerBeanDefinition()方法)
+			 *         beanName = org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+			 *         BeanDefinition = ConfigurationClassPostProcessor
+			 *         所以，org.springframework.context.annotation.internalConfigurationAnnotationProcessor这玩意只是ConfigurationClassPostProcessor在容器中的beanName
 			 *
 			 *
 			 * 从容器中查出所有实现了BeanDefinitionRegistryPostProcessor接口的bean名称，这个getBeanNamesForType方法只会得到框架自带
 			 * 的BeanDefinitionRegistryPostProcessor和加载配置类，由于自定义的BeanDefinitionRegistryPostProcessor在配置类中，所以
 			 * 容器中bean的定义还没有自定义的BeanDefinitionRegistryPostProcessor。
-			 * 虽然这一步的getBeanNamesForType没有得到自定义的BeanDefinitionRegistryPostProcessor，但是这一步会加载配置类，所以经过
-			 * 这一步后，我们自定义的BeanDefinitionRegistryPostProcessor的bean定义消息就加入到容器中了，等下一步的getBeanNamesForType
+			 * 虽然这一步的getBeanNamesForType没有得到自定义的BeanDefinitionRegistryPostProcessor，但是这一步会加载配置类(ConfigurationClassPostProcessor)，
+			 * 所以经过这一步后，我们自定义的BeanDefinitionRegistryPostProcessor的bean定义消息就加入到容器中了，等下一步的getBeanNamesForType
 			 * 方法执行，就会得到我们自定义的BeanDefinitionRegistryPostProcessor。
 			 *
 			 * 注：
@@ -121,9 +124,9 @@ final class PostProcessorRegistrationDelegate {
 				//(祝光泉) 判断是否实现了PriorityOrdered接口的
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 					/**---祝光泉---
-					 * Q：上面getBeanNamesForType得到的beanName是org.springframework.context.annotation.internalConfigurationAnnotationProcessor
-					 *    为什么这一步的getBean()得到的是ConfigurationClassPostProcessor？
-					 * A：
+					 * 祝光泉Q：上面getBeanNamesForType得到的beanName是org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+					 *         为什么这一步的getBean()创建的对象却是ConfigurationClassPostProcessor？
+					 * 祝光泉A：因为ConfigurationClassPostProcessor在容器中的beanName就是等于org.springframework.context.annotation.internalConfigurationAnnotationProcessor
 					 *
 					 * 显示的调用容器的getBean()创建出该对象然后加入到currentRegistryProcessors集合中去
 					 * 注：这里的getBean()方法会创建ppName对应的bean实例对象
@@ -138,11 +141,11 @@ final class PostProcessorRegistrationDelegate {
 			//(祝光泉) 加入到用于保存到registryProcessors中(用于最后执行postProcessBeanFactory方法)
 			registryProcessors.addAll(currentRegistryProcessors);
 			/**---祝光泉---
-			* 遍历currentRegistryProcessors集合, 执行postProcessBeanDefinitionRegistry()方法（只执行框架自带的BeanDefinitionRegistryPostProcessor的
+			 * 遍历currentRegistryProcessors集合, 执行postProcessBeanDefinitionRegistry()方法（只执行框架自带的BeanDefinitionRegistryPostProcessor的
 			 * postProcessBeanDefinitionRegistry()方法，postProcessBeanFactory()方法不在这一步执行）
-			*     注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，
+			 *     注：这里典型的BeanDefinitionRegistryPostProcessor就是ConfigurationClassPostProcessor，
 			 *     作用是：进行bean定义的加载 比如：解析@Configuration、@Import、@ComponentScan、@Bean注解，将bean的定义消息放到容器中
-			*/
+			 */
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry, beanFactory.getApplicationStartup());
 			//(祝光泉) 调用完之后，马上clear
 			currentRegistryProcessors.clear();
@@ -153,8 +156,8 @@ final class PostProcessorRegistrationDelegate {
 
 			// Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.
 			/**---祝光泉---
-			 * Q：这里为什么又要执行一次getBeanNamesForType方法？
-			 * A：重复执行是因为执行完上面的BeanDefinitionRegistryPostProcessor,可能会新增了其他的BeanDefinitionRegistryPostProcessor, 因此需要重新查找
+			 * 祝光泉Q：这里为什么又要执行一次getBeanNamesForType方法？
+			 * 祝光泉A：重复执行是因为执行完上面的BeanDefinitionRegistryPostProcessor,可能会新增了其他的BeanDefinitionRegistryPostProcessor, 因此需要重新查找
 			 *
 			 * 我们自定义的BeanDefinitionRegistryPostProcessor且实现了PriorityOrdered或Ordered接口的类，在这个Next里执行
 			 */
@@ -306,6 +309,10 @@ final class PostProcessorRegistrationDelegate {
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
+		/**祝光泉
+		 * 执行这个getBeanNamesForType()方法会得到所有框架自带和自定义的BeanPostProcessor，
+		 * 其中自动装配的BeanPostProcessor(AutowiredAnnotationBeanPostProcessor)也是这里得到
+		 */
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when
@@ -316,10 +323,12 @@ final class PostProcessorRegistrationDelegate {
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
 		// Ordered, and the rest.
-		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();
-		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();
-		List<String> orderedPostProcessorNames = new ArrayList<>();
-		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
+		// 祝光泉 创建4个集合 分别存放不同的BeanPostProcessor
+		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();// 祝光泉 存放实现了PriorityOrdered接口的BeanPostProcessor
+		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();// 祝光泉 存放实现了PriorityOrdered接口而且是MergedBeanDefinitionPostProcessor的BeanPostProcessor
+		List<String> orderedPostProcessorNames = new ArrayList<>();// 祝光泉 存放实现了Ordered接口的BeanPostProcessor
+		List<String> nonOrderedPostProcessorNames = new ArrayList<>();// 祝光泉 存放没有实现了优先级接口的BeanPostProcessor
+
 		for (String ppName : postProcessorNames) {
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
